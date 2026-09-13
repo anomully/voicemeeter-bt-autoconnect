@@ -1,6 +1,6 @@
 # voicemeeter-bt-autoconnect
 
-Bluetooth headphones that just work with Voicemeeter Banana, for streamers, gamers, and anyone else running their audio through it. Works with any Bluetooth headphones: AirPods, AirPods Pro, AirPods Max, Sony, Bose, Beats, anything that pairs with Windows.
+Makes your Bluetooth headphones just work with Voicemeeter Banana, for streamers, gamers, and anyone else running their audio through it. Works with any Bluetooth headphones: AirPods, AirPods Pro, AirPods Max, Sony, Bose, Beats, anything that pairs with Windows.
 
 Put your headphones on, and within about 3 seconds whatever you were watching or listening to is in your ears. No opening Voicemeeter, no re-selecting Hardware Out.
 
