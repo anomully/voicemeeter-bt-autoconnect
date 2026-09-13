@@ -2,7 +2,7 @@
 
 Makes your Bluetooth headphones just work with Voicemeeter Banana. For streamers, gamers, and anyone else running their audio through it.
 
-Put your headphones on and your audio follows within about 3 seconds. No opening Voicemeeter, no re-selecting Hardware Out. Works with AirPods, Sony, Bose, or any headphones that pair with Windows.
+Put your headphones on and your audio follows within about 3 seconds. No opening Voicemeeter, no re-selecting Hardware Out. Works with any Bluetooth headphones.
 
 ## Requirements
 
@@ -81,7 +81,7 @@ I didn't want to choose between a real audio setup and headphones that just work
 ## Who it's for
 
 - **Voicemeeter Banana** users on Windows
-- with **Bluetooth headphones** of any brand
+- with **Bluetooth headphones**
 - and optionally a **USB mic** Voicemeeter loses track of on reconnect
 
 No Voicemeeter? You don't need this. Windows already handles it.
