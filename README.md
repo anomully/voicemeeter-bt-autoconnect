@@ -1,6 +1,6 @@
-# voicemeeter-bluetooth-autoswitch
+# voicemeeter-bt-autoconnect
 
-Mac-style headphone switching for Voicemeeter Banana on Windows. Works with any Bluetooth headphones: AirPods, AirPods Pro, AirPods Max, Sony, Bose, Beats, anything that pairs with Windows.
+Mac-style auto-connect for Bluetooth headphones in Voicemeeter Banana on Windows. Works with any Bluetooth headphones: AirPods, AirPods Pro, AirPods Max, Sony, Bose, Beats, anything that pairs with Windows.
 
 Put your headphones on, and within about 3 seconds whatever you were watching or listening to is in your ears. No Bluetooth tray, no opening Voicemeeter, no re-selecting Hardware Out.
 
@@ -54,11 +54,11 @@ Windows exposes Bluetooth headphones as two devices: a stereo one, and a "Headse
 **1. Get the code and dependencies**
 
 ```powershell
-git clone https://github.com/anomully/voicemeeter-bluetooth-autoswitch.git $HOME\voicemeeter-bluetooth-autoswitch
+git clone https://github.com/anomully/voicemeeter-bt-autoconnect.git $HOME\voicemeeter-bt-autoconnect
 ```
 
 ```powershell
-pip install -r $HOME\voicemeeter-bluetooth-autoswitch\requirements.txt
+pip install -r $HOME\voicemeeter-bt-autoconnect\requirements.txt
 ```
 
 **2. Set Windows sound defaults** (Settings → System → Sound → More sound settings)
@@ -71,13 +71,13 @@ pip install -r $HOME\voicemeeter-bluetooth-autoswitch\requirements.txt
 With Voicemeeter Banana open and your headphones connected, see what it detects (read-only, changes nothing):
 
 ```powershell
-python $HOME\voicemeeter-bluetooth-autoswitch\bt_switcher.py --list
+python $HOME\voicemeeter-bt-autoconnect\bt_switcher.py --list
 ```
 
 Then run it for real:
 
 ```powershell
-python $HOME\voicemeeter-bluetooth-autoswitch\bt_switcher.py
+python $HOME\voicemeeter-bt-autoconnect\bt_switcher.py
 ```
 
 You should see `Set A1 to: Headphones (...)`. Disconnect the headphones, reconnect them, and watch it rebind. `Ctrl+C` to stop.
@@ -85,13 +85,13 @@ You should see `Set A1 to: Headphones (...)`. Disconnect the headphones, reconne
 **4. Run it at login** (PowerShell as administrator)
 
 ```powershell
-schtasks /create /tn "VoicemeeterBluetoothAutoswitch" /tr "wscript.exe $HOME\voicemeeter-bluetooth-autoswitch\bt_switcher.vbs" /sc ONLOGON /delay 0000:30 /rl HIGHEST /f
+schtasks /create /tn "VoicemeeterBTAutoconnect" /tr "wscript.exe $HOME\voicemeeter-bt-autoconnect\bt_switcher.vbs" /sc ONLOGON /delay 0000:30 /rl HIGHEST /f
 ```
 
 On a laptop, also let it run on battery:
 
 ```powershell
-$task = Get-ScheduledTask -TaskName "VoicemeeterBluetoothAutoswitch"; $task.Settings.DisallowStartIfOnBatteries = $false; $task.Settings.StopIfGoingOnBatteries = $false; $task | Set-ScheduledTask
+$task = Get-ScheduledTask -TaskName "VoicemeeterBTAutoconnect"; $task.Settings.DisallowStartIfOnBatteries = $false; $task.Settings.StopIfGoingOnBatteries = $false; $task | Set-ScheduledTask
 ```
 
 The `.vbs` launcher exists only to start Python without a console window.
@@ -115,7 +115,7 @@ To see device names exactly as the script sees them, run it with `--list`.
 Some USB mics come up in a bad state after boot and need to be unplugged and replugged. [`reset_mic.ps1`](reset_mic.ps1) does that in software by disabling and re-enabling the device. Schedule it to run at login (administrator):
 
 ```powershell
-schtasks /create /tn "ResetUSBMic" /tr "powershell.exe -ExecutionPolicy Bypass -File $HOME\voicemeeter-bluetooth-autoswitch\reset_mic.ps1 -Name *K670*" /sc ONLOGON /delay 0000:15 /rl HIGHEST /f
+schtasks /create /tn "ResetUSBMic" /tr "powershell.exe -ExecutionPolicy Bypass -File $HOME\voicemeeter-bt-autoconnect\reset_mic.ps1 -Name *K670*" /sc ONLOGON /delay 0000:15 /rl HIGHEST /f
 ```
 
 Replace `*K670*` with part of your mic's name as it appears in Device Manager.
