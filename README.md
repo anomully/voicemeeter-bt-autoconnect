@@ -1,8 +1,8 @@
 # voicemeeter-bt-autoconnect
 
-Mac-style auto-connect for Bluetooth headphones in Voicemeeter Banana on Windows. Works with any Bluetooth headphones: AirPods, AirPods Pro, AirPods Max, Sony, Bose, Beats, anything that pairs with Windows.
+Bluetooth headphones that just work with Voicemeeter Banana, for streamers, gamers, and anyone else running their audio through it. Works with any Bluetooth headphones: AirPods, AirPods Pro, AirPods Max, Sony, Bose, Beats, anything that pairs with Windows.
 
-Put your headphones on, and within about 3 seconds whatever you were watching or listening to is in your ears. No Bluetooth tray, no opening Voicemeeter, no re-selecting Hardware Out.
+Put your headphones on, and within about 3 seconds whatever you were watching or listening to is in your ears. No opening Voicemeeter, no re-selecting Hardware Out.
 
 ## Why this exists
 
@@ -10,7 +10,7 @@ My desk is a gaming and streaming setup: a studio mic, a capture card, several a
 
 The catch is that Voicemeeter binds to one specific hardware device. When Bluetooth headphones disconnect and reconnect, Voicemeeter doesn't follow them. Hardware Out A1 sits there pointing at a device that's gone, and you hear nothing until you open Voicemeeter and pick your headphones again. Every single time.
 
-On a Mac, you take AirPods out of the case and the audio just moves. I didn't want to choose between a real audio setup and that kind of convenience, so I wrote this. It's been running on my machine all day, every day since.
+Without Voicemeeter, Windows handles this fine: the headphones connect and audio moves to them. Voicemeeter breaks that. I didn't want to choose between a real audio setup and that kind of convenience, so I wrote this. It's been running on my machine all day, every day since.
 
 ## Who it's for
 
