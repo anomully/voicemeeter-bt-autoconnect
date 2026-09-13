@@ -66,7 +66,7 @@ The commands below go in PowerShell. To open it, right-click the Start button an
 
 **1. Download it**
 
-[Download the ZIP](https://github.com/anomully/voicemeeter-bt-autoconnect/archive/refs/heads/main.zip) and extract it into your user folder (`C:\Users\<your name>`). Rename the extracted folder to `voicemeeter-bt-autoconnect`.
+[Download the ZIP](https://github.com/anomully/voicemeeter-bt-autoconnect/releases/latest/download/voicemeeter-bt-autoconnect.zip), right-click it, choose **Extract All**, and set the destination to your user folder (`C:\Users\<your name>`).
 
 If you use [Git](https://git-scm.com/downloads/win), you can clone it instead:
 

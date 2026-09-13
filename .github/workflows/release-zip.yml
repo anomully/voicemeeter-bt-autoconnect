@@ -1,0 +1,26 @@
+# Keeps a download on the "latest" release whose folder is already named
+# voicemeeter-bt-autoconnect. GitHub's own branch ZIP names it
+# voicemeeter-bt-autoconnect-main, which breaks the README's paths.
+name: Release ZIP
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build ZIP
+        run: git archive --format=zip --prefix=voicemeeter-bt-autoconnect/ -o voicemeeter-bt-autoconnect.zip HEAD
+      - name: Upload to latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view latest >/dev/null 2>&1 || gh release create latest --title "Latest" --notes "Download voicemeeter-bt-autoconnect.zip below. Updated automatically on every change."
+          gh release upload latest voicemeeter-bt-autoconnect.zip --clobber
