@@ -30,13 +30,24 @@ If you don't use Voicemeeter, you don't need this. Windows' own default-device s
 
 A small Python script starts at login and runs hidden in the background.
 
-1. Every 3 seconds it asks Windows which audio outputs are Bluetooth, and asks Voicemeeter which outputs it can use.
+1. Every 3 seconds it reads Windows' list of connected audio devices and picks out the Bluetooth ones.
 2. Bluetooth is detected from how Windows connects the device, not from its name. Renamed headphones, any brand, and non-English Windows all work.
-3. When a Bluetooth output appears that wasn't there at the last check, it sets `Bus[0]` (A1) to it and restarts the Voicemeeter audio engine so the change takes effect.
+3. When a Bluetooth output appears that wasn't there at the last check, it confirms Voicemeeter can see it, sets `Bus[0]` (A1) to it, and restarts the Voicemeeter audio engine so the change takes effect.
 4. It does the same for the mic on `Strip[0]` (Hardware Input 1).
 5. If nothing changed, it does nothing. The engine is only restarted on an actual switch.
 
 Windows' sound settings stay pointed at Voicemeeter permanently. Only Voicemeeter's hardware bindings move.
+
+### Lightweight by design
+
+For this to feel seamless it has to run all the time, including while you're gaming. If you had to remember to start it, it would defeat the point. So it's built to cost next to nothing, even on a modest PC:
+
+- **Checks every 3 seconds, not continuously.** Between checks the script is asleep and uses no CPU.
+- **Each check is a quick registry read**, about 1 ms of CPU (roughly 0.04% of one core). Asking Voicemeeter for its device list makes it re-scan every audio device on the system, which costs around 60 times more, so the script only asks Voicemeeter when something has actually connected.
+- **No window, no tray icon, no extra services.** One hidden Python process using about 35 MB of memory, which is mostly Python itself.
+- **The audio engine only restarts when you actually connect something.** Nothing happens while your setup is stable.
+
+Measured on the author's machine with Python 3.14. Your numbers will vary a little, but not by orders of magnitude.
 
 ### The Bluetooth "Headset" trap
 
@@ -133,7 +144,8 @@ Check `bt_switcher_log.txt` next to the script first.
 ## Notes for contributors
 
 - `voicemeeterlib` has no string getter for the currently bound device, so the script can't read A1 back. It remembers what it last set instead. On startup it always binds once.
-- Bluetooth detection reads endpoint properties from `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render`, so there are no extra dependencies. Voicemeeter's WDM names are `<device description> (<interface name>)`, built from the same properties.
+- Detection reads endpoint properties from `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render` and `\Capture`, so there are no extra dependencies. Voicemeeter's WDM names are `<device description> (<interface name>)`, built from the same properties, so the two line up exactly.
+- Don't poll `vm.device.outs` / `vm.device.ins` in the loop. Each call makes Voicemeeter re-enumerate hardware (~40 ms and ~75 ms of CPU on the author's machine, versus ~1 ms for the registry scan). The script only calls them to confirm Voicemeeter can see a device right before binding it.
 - The single-instance lock is a socket bind rather than a PID file because `pythonw` doesn't appear reliably in the process list.
 
 ## License
