@@ -57,16 +57,24 @@ Windows exposes Bluetooth headphones as two devices: a stereo one, and a "Headse
 
 - Windows 10 or 11
 - [Voicemeeter Banana](https://vb-audio.com/Voicemeeter/banana.htm)
-- Python 3.10+ with `pythonw.exe` on your PATH
-- Headphones already paired in Windows Bluetooth settings
+- [Python 3.10 or newer](https://www.python.org/downloads/windows/). In the installer, tick **Add python.exe to PATH** before clicking Install.
+- Headphones already [paired with Windows](https://support.microsoft.com/en-us/windows/pair-a-bluetooth-device-in-windows-2be7b51f-6ae9-b757-a3b9-95ee40c3e242)
 
 ## Install
 
-**1. Get the code and dependencies**
+The commands below go in PowerShell. To open it, right-click the Start button and choose **Terminal** (or **Windows PowerShell**).
+
+**1. Download it**
+
+[Download the ZIP](https://github.com/anomully/voicemeeter-bt-autoconnect/archive/refs/heads/main.zip) and extract it into your user folder (`C:\Users\<your name>`). Rename the extracted folder to `voicemeeter-bt-autoconnect`.
+
+If you use [Git](https://git-scm.com/downloads/win), you can clone it instead:
 
 ```powershell
 git clone https://github.com/anomully/voicemeeter-bt-autoconnect.git $HOME\voicemeeter-bt-autoconnect
 ```
+
+**Install the two Python packages it needs:**
 
 ```powershell
 pip install -r $HOME\voicemeeter-bt-autoconnect\requirements.txt
@@ -138,7 +146,7 @@ Check `bt_switcher_log.txt` next to the script first.
 - **Audio drops out every few seconds.** More than one copy is running, each restarting the engine. The script guards against this with a lock on local port 47474, but make sure the scheduled task is `ONLOGON` and not a repeating trigger.
 - **Music sounds like a phone call.** Something picked the headphones' Headset endpoint. Check Windows sound defaults are set to Voicemeeter, not the headphones directly.
 - **Your headphones aren't detected.** Run with `--list`. Headphones that use their own USB dongle aren't Windows Bluetooth devices, so they won't show up. Open an issue with the output.
-- **Nothing happens at login.** Run step 3 by hand to see the error. Usually `pythonw.exe` isn't on PATH; edit `bt_switcher.vbs` to use the full path to it.
+- **Nothing happens at login.** Run step 3 by hand to see the error. Usually Python isn't on PATH: re-run the [Python installer](https://www.python.org/downloads/windows/), choose **Modify**, and tick **Add Python to environment variables**.
 - **Another app is using port 47474.** Change `LOCK_PORT` in the script.
 
 ## Notes for contributors
