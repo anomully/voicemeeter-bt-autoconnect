@@ -99,7 +99,7 @@ def get_input_candidate():
 
 
 def pick_output(candidates, previous_candidates, current):
-    # Like a Mac, the headphones you just connected win.
+    # The headphones you just connected win.
     newly_connected = [n for n in candidates if n not in previous_candidates]
     if newly_connected:
         return newly_connected[-1]
