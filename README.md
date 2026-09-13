@@ -74,25 +74,13 @@ pip install -r $HOME\voicemeeter-bt-autoconnect\requirements.txt
 - Playback: **Voicemeeter Input** as default and default communication device
 - Recording: **Voicemeeter Out B1** as default and default communication device
 
-**3. Test it**
-
-With Voicemeeter open and headphones connected, check what it detects (changes nothing):
+**3. Start it** (PowerShell as admin)
 
 ```powershell
-python $HOME\voicemeeter-bt-autoconnect\bt_switcher.py --list
+schtasks /create /tn "VoicemeeterBTAutoconnect" /tr "wscript.exe $HOME\voicemeeter-bt-autoconnect\bt_switcher.vbs" /sc ONLOGON /delay 0000:30 /rl HIGHEST /f; schtasks /run /tn "VoicemeeterBTAutoconnect"
 ```
 
-Then run it, and disconnect and reconnect your headphones to watch it rebind. `Ctrl+C` to stop.
-
-```powershell
-python $HOME\voicemeeter-bt-autoconnect\bt_switcher.py
-```
-
-**4. Run it at login** (PowerShell as admin)
-
-```powershell
-schtasks /create /tn "VoicemeeterBTAutoconnect" /tr "wscript.exe $HOME\voicemeeter-bt-autoconnect\bt_switcher.vbs" /sc ONLOGON /delay 0000:30 /rl HIGHEST /f
-```
+That's it. It's running now and starts on its own every time you log in.
 
 On a laptop, also allow it on battery:
 
@@ -127,7 +115,7 @@ Start with `bt_switcher_log.txt` next to the script.
 - **Audio drops out every few seconds:** more than one copy is running. Make sure the task runs at logon, not on a repeating schedule.
 - **Sounds like a phone call:** Windows' sound defaults point at the headphones instead of Voicemeeter.
 - **Headphones not detected:** check `--list`. Headphones using their own USB dongle aren't Windows Bluetooth devices. Otherwise, open an issue with the output.
-- **Nothing happens at login:** run step 3 to see the error. Usually Python isn't on PATH; rerun the [Python installer](https://www.python.org/downloads/windows/), choose **Modify**, and add it.
+- **Nothing happens:** run `python $HOME\voicemeeter-bt-autoconnect\bt_switcher.py` to see the error. Usually Python isn't on PATH; rerun the [Python installer](https://www.python.org/downloads/windows/), choose **Modify**, and add it.
 - **Port 47474 in use:** change `LOCK_PORT` in the script.
 
 ## Notes for contributors
