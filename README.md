@@ -1,6 +1,6 @@
 # airpods-autoswitch-windows
 
-Mac-style AirPods behaviour on Windows, for people who run their audio through Voicemeeter Banana.
+Mac-style AirPods behaviour on Windows, for people who run their audio through Voicemeeter Banana. Works with any Bluetooth headphones.
 
 Take your AirPods out of the case, put them in, and within about 3 seconds whatever you were watching or listening to is in your ears. No Bluetooth tray, no opening Voicemeeter, no re-selecting Hardware Out.
 
@@ -10,19 +10,19 @@ My desk is a gaming and streaming setup: a studio mic, a capture card, several a
 
 The catch is that Voicemeeter binds to a specific hardware device. When AirPods disconnect and reconnect, Voicemeeter doesn't follow them. Hardware Out A1 sits there pointing at a device that's gone, and you hear nothing until you open Voicemeeter and pick the AirPods again. Every single time.
 
-On a Mac, AirPods just work. You put them in and the audio moves. I didn't want to choose between a real audio setup and that kind of convenience, so I wrote this. It's been running on my machine all day, every day since.
+This happens with any Bluetooth headphones, not just AirPods. On a Mac, AirPods just work. You put them in and the audio moves. I didn't want to choose between a real audio setup and that kind of convenience, so I wrote this. It's been running on my machine all day, every day since.
 
 ## Who it's for
 
 - You use **Voicemeeter Banana** on Windows.
-- You use **AirPods, AirPods Pro, or AirPods Max** (or any Bluetooth headphones, with one config change).
+- You use **Bluetooth headphones**: AirPods, AirPods Pro, AirPods Max, Sony, Bose, anything that pairs with Windows. No config needed.
 - Optionally, you have a **USB mic** that Voicemeeter loses track of when it reconnects.
 
 If you don't use Voicemeeter, you don't need this. Windows' own default-device switching already handles plain setups.
 
 ## What it does and doesn't do
 
-**Does:** Watches Voicemeeter's device list. When your AirPods show up, it binds them to Hardware Out A1. When your USB mic shows up, it binds it to Hardware Input 1.
+**Does:** Watches Voicemeeter's device list. When Bluetooth headphones show up, it binds them to Hardware Out A1. If you connect a second pair, the one you just connected wins. When your USB mic shows up, it binds it to Hardware Input 1.
 
 **Doesn't:** Handle the Bluetooth connection. Windows does that on its own once the AirPods are paired. This fixes the part after: Voicemeeter left pointing at nothing.
 
@@ -30,24 +30,24 @@ If you don't use Voicemeeter, you don't need this. Windows' own default-device s
 
 A small Python script starts at login and runs hidden in the background.
 
-1. Every 3 seconds it asks Voicemeeter for the list of available output and input devices.
-2. It looks for an output whose name contains `AirPods`, skipping the `Headset` variant (see below) and keeping only WDM devices. If more than one pair is connected, names containing `Pro` win.
-3. If that device isn't the one it last bound, it sets `Bus[0]` (A1) to it and restarts the Voicemeeter audio engine so the change takes effect.
+1. Every 3 seconds it asks Windows which audio outputs are Bluetooth, and asks Voicemeeter which outputs it can use.
+2. Bluetooth is detected from how Windows connects the device, not from its name, so it works with renamed headphones and on non-English Windows.
+3. When a Bluetooth output appears that wasn't there at the last check, it sets `Bus[0]` (A1) to it and restarts the Voicemeeter audio engine so the change takes effect. If the bound pair disconnects and another pair is still connected, it falls back to that one.
 4. It does the same for the mic on `Strip[0]` (Hardware Input 1).
 5. If nothing changed, it does nothing. The engine is only restarted on an actual switch.
 
 Windows' sound settings stay pointed at Voicemeeter permanently. Only Voicemeeter's hardware bindings move.
 
-### The AirPods "Headset" trap
+### The Bluetooth "Headset" trap
 
-Windows exposes every pair of AirPods as two devices: a stereo one, and a "Headset" one that enables the mic but drops audio to phone-call quality. If anything selects the Headset endpoint, music sounds terrible. The script ignores any device with `Headset` in its name, so you always get stereo. Use a separate mic.
+Windows exposes Bluetooth headphones as two devices: a stereo one, and a "Headset" (hands-free) one that enables the headphones' mic but drops audio to phone-call quality. If anything selects the Headset endpoint, music sounds terrible. Windows tags the two differently (`BTHENUM` for stereo, `BTHHFENUM` for hands-free), and the script only ever picks stereo. Use a separate mic.
 
 ## Requirements
 
 - Windows 10 or 11
 - [Voicemeeter Banana](https://vb-audio.com/Voicemeeter/banana.htm)
 - Python 3.10+ with `pythonw.exe` on your PATH
-- AirPods already paired in Windows Bluetooth settings
+- Headphones already paired in Windows Bluetooth settings
 
 ## Install
 
@@ -68,13 +68,19 @@ pip install -r $HOME\airpods-autoswitch-windows\requirements.txt
 
 **3. Test it**
 
-With Voicemeeter Banana open and your AirPods connected:
+With Voicemeeter Banana open and your headphones connected, see what it detects (read-only, changes nothing):
+
+```powershell
+python $HOME\airpods-autoswitch-windows\bt_switcher.py --list
+```
+
+Then run it for real:
 
 ```powershell
 python $HOME\airpods-autoswitch-windows\bt_switcher.py
 ```
 
-You should see `Set A1 to: ...AirPods...`. Take the AirPods out, put them back, and watch it rebind. `Ctrl+C` to stop.
+You should see `Set A1 to: Headphones (...)`. Disconnect the headphones, reconnect them, and watch it rebind. `Ctrl+C` to stop.
 
 **4. Run it at login** (PowerShell as administrator)
 
@@ -96,13 +102,13 @@ Edit the block at the top of [`bt_switcher.py`](bt_switcher.py):
 
 | Setting | Default | What it does |
 |---|---|---|
-| `OUTPUT_MATCH` | `"AirPods"` | Substring to match your headphones' name. Change it for non-Apple headphones. |
-| `OUTPUT_PREFERRED` | `("Pro",)` | Which pair wins when several are connected. |
+| `OUTPUT_MATCH` | `()` | Only use Bluetooth outputs whose name contains one of these. Empty means all. |
+| `OUTPUT_EXCLUDE` | `()` | Skip Bluetooth outputs whose name contains one of these, e.g. `("SRS-XB10",)` to ignore a speaker. |
 | `INPUT_MATCH` | `("K670", "FIFINE")` | Substrings to match your USB mic. Set to `()` to leave inputs alone. |
 | `POLL_INTERVAL` | `3` | Seconds between checks. |
 | `STARTUP_DELAY` | `8` | Seconds to wait at login if Voicemeeter isn't running yet. |
 
-To find your device names, open Voicemeeter's Hardware Out A1 dropdown. Names are listed exactly as the script sees them.
+To see device names exactly as the script sees them, run it with `--list`.
 
 ## Optional: USB mic reset at login
 
@@ -119,13 +125,15 @@ Replace `*K670*` with part of your mic's name as it appears in Device Manager.
 Check `bt_switcher_log.txt` next to the script first.
 
 - **Audio drops out every few seconds.** More than one copy is running, each restarting the engine. The script guards against this with a lock on local port 47474, but make sure the scheduled task is `ONLOGON` and not a repeating trigger.
-- **Music sounds like a phone call.** Something picked the AirPods Headset endpoint. Check Windows sound defaults are set to Voicemeeter, not the AirPods directly.
+- **Music sounds like a phone call.** Something picked the headphones' Headset endpoint. Check Windows sound defaults are set to Voicemeeter, not the headphones directly.
+- **Your headphones aren't detected.** Run with `--list`. Headphones that use their own USB dongle aren't Windows Bluetooth devices, so they won't show up. Open an issue with the output.
 - **Nothing happens at login.** Run step 3 by hand to see the error. Usually `pythonw.exe` isn't on PATH; edit `bt_switcher.vbs` to use the full path to it.
 - **Another app is using port 47474.** Change `LOCK_PORT` in the script.
 
 ## Notes for contributors
 
 - `voicemeeterlib` has no string getter for the currently bound device, so the script can't read A1 back. It remembers what it last set instead. On startup it always binds once.
+- Bluetooth detection reads endpoint properties from `HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\MMDevices\Audio\Render`, so there are no extra dependencies. Voicemeeter's WDM names are `<device description> (<interface name>)`, built from the same properties.
 - The single-instance lock is a socket bind rather than a PID file because `pythonw` doesn't appear reliably in the process list.
 
 ## License
